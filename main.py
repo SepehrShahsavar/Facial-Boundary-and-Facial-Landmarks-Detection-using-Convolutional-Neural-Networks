@@ -48,7 +48,7 @@ def convert_ann(array, image_shape):
 
 
 def read_ann():
-    ann_f = open("./new_ann.txt", "r")
+    ann_f = open("./newer_ann.txt", "r")
     lines = ann_f.readlines()
 
     pointer = 0
@@ -126,11 +126,15 @@ for batch in full_ds:
 
 full_ds = tf.data.Dataset.from_tensor_slices((batch_inputs, batch_labels))
 
-
-
 # Training, Testing
+train_size = int(0.8 * len(full_ds))
+test_size = int(0.20 * len(full_ds))
 
-
+train_ds = full_ds.take(train_size)
+test_ds = full_ds.skip(train_size)
+print(len(full_ds))
+print(len(train_ds))
+print(len(test_ds))
 # Model
 
 

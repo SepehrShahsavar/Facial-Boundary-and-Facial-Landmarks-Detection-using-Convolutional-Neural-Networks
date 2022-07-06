@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Face Boundry and Landmark Detection using CNN.iml" filepath="$PROJECT_DIR$/.idea/Face Boundry and Landmark Detection using CNN.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Face-Boundary-and-Facial-Landmark-Detection-Using-Convolutional-Neural-Networks.iml" filepath="$PROJECT_DIR$/.idea/Face-Boundary-and-Facial-Landmark-Detection-Using-Convolutional-Neural-Networks.iml" />
     </modules>
   </component>
 </project>

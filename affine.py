@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-image_path = "./Data/train/0--Parade/0.jpg"
+image_path = "Data/train/0--Parade/0_Parade_marchingband_1_849.jpg"
 
 image = cv2.imread(image_path)
 
