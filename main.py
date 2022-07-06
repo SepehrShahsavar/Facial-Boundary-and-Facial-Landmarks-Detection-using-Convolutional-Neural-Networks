@@ -20,10 +20,10 @@ class BoundingBox:
 def convert_ann(array, image_shape):
     x, y, w, h = array[0], array[1], array[2], array[3]
     landmakrs = array[4:]
-    
-    w = (w / image_shape[0]) * img_width
-    h = (h / image_shape[1]) * img_height
-    
+
+    w = int((w / image_shape[0]) * img_width)
+    h = int((h / image_shape[1]) * img_height)
+
     points1 = np.array([(0, 0),
                         (image_shape[1] - 1, 0),
                         (image_shape[1] - 1, image_shape[0] - 1)], np.float32)
@@ -35,19 +35,17 @@ def convert_ann(array, image_shape):
     M = cv2.getAffineTransform(points1, points2)
 
     x, y = (np.array([x, y]) @ M)[:2]
-    
+    x, y = int(x), int(y)
+
     temp = []
     for i in range(len(landmakrs) // 2):
         temp.append([landmakrs[i], landmakrs[i + 1]])
-    
+
     landmarks = (np.array(temp) @ M)[:, :2]
     landmarks = landmarks.astype(np.int32)
-    
+
     return x, y, w, h, landmarks
-    
-    
-    
-    
+
 
 def read_ann():
     ann_f = open("./new_ann.txt", "r")
@@ -77,6 +75,27 @@ def read_ann():
     return image_anns
 
 
+def add_labels(batch_index):
+    # Vector = [p, x, y, w, h]
+    batch_label = np.zeros((batch_size, cell_count, cell_count, 5))
+    cell_size = 256 / cell_count
+    for k in range(batch_size):
+        image_ann = annotation[batch_index * 75 + k]
+        for box in image_ann.bounding_boxes:
+            x, y, w, h = box.x, box.y, box.w, box.h
+            for i in range(cell_count):
+                for j in range(cell_count):
+                    vector = np.zeros(5)
+                    if i * cell_size < x < (i + 1) * cell_size and j * cell_size < y < (j + 1) * cell_size:
+                        vector[0] = 1
+                        vector[1] = (x - i * cell_size) / cell_size
+                        vector[2] = (y - i * cell_size) / cell_size
+                        vector[3] = (w // cell_size) + 1
+                        vector[4] = (h // cell_size) + 1
+                    batch_label[k, i, j, :] = vector
+        
+    return batch_label
+    
 cell_count = 8
 img_height, img_width = 256, 256
 batch_size = 75
@@ -92,7 +111,20 @@ full_ds = tf.keras.utils.image_dataset_from_directory(
 annotation = read_ann()
 
 
-# Add Labels
+# Add Lables
+
+index = 0
+my_input = []
+
+batch_labels = []
+batch_inputs = []
+for batch in full_ds:
+    batch_label = add_labels(index)
+    batch_labels.append(batch_label)
+    batch_inputs.append(batch[0])
+    index += 1
+
+full_ds = dataset2 = tf.data.Dataset.from_tensor_slices((batch_inputs, batch_labels))
 
 
 
@@ -100,7 +132,6 @@ annotation = read_ann()
 
 
 # Model
-
 
 
 # Non Maximum Suppression
