@@ -1,21 +1,20 @@
 import numpy as np
 import cv2
 from tqdm import tqdm
-import tensorflow as tf
-from tensorflow import keras
+
+class Image:
+    def __init__(self, image_px, bounding_boxes):
+        self.image_px = image_px
+        self.bounding_boxes = bounding_boxes
+
 
 class BoundingBox:
-    def __init__(self, image, x, y, w, h):
-        self.image = image
+    def __init__(self, x, y, w, h, landmarks):
         self.x = x
         self.y = y
         self.w = w
         self.h = h
-
-
-class Landmarks:
-    def __init__(self, image, bounding_box, facial_landmarks):
-        self.facial_landmarks = facial_landmarks
+        self.landmarks = landmarks
 
 
 def read_data():
@@ -24,32 +23,32 @@ def read_data():
     lines = data_desc.readlines()
     pointer = 0
     images_list = []
-    bounding_boxes = []
-    landmarks = []
     pbar = tqdm(total=4275, initial=0)
 
     while pointer < len(lines):
         path = data_path + lines[pointer][:-1]
-        image = cv2.imread(path)
-        images_list.append(image)
+        image_px = cv2.imread(path)
         pointer += 1
         n = int(lines[pointer])
         pointer += 1
+        bounding_boxes = []
         for i in range(n):
             temp = lines[pointer]
             temp = temp.split()
-            bb = BoundingBox(len(images_list) - 1, temp[0], temp[1], temp[2], temp[3])
-            bounding_boxes.append(bb)
-            lm = Landmarks(len(images_list) - 1, len(bounding_boxes) - 1, temp[4:])
-            landmarks.append(lm)
+            landmarks = temp[4:]
+            bounding_box = BoundingBox(temp[0], temp[1], temp[2], temp[3], landmarks)
+            bounding_boxes.append(bounding_box)
             pointer += 1
+        image = Image(image_px, bounding_boxes)
+        images_list.append(image)
         pbar.update(1)
         
     pbar.close()
 
-    return images_list, bounding_boxes, landmarks
+    return images_list
 
 
+images_list = read_data()
 # model = ?
 
 
