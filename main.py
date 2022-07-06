@@ -124,7 +124,7 @@ for batch in full_ds:
     batch_inputs.append(batch[0])
     index += 1
 
-full_ds = dataset2 = tf.data.Dataset.from_tensor_slices((batch_inputs, batch_labels))
+full_ds = tf.data.Dataset.from_tensor_slices((batch_inputs, batch_labels))
 
 
 
